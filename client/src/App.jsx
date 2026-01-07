@@ -116,6 +116,7 @@ function App() {
           todayWorkout={todayWorkout}
           logWorkout={logWorkout}
           currentWeek={currentWeek}
+          user={user}
         />
       )}
       {activeTab === 'setup' && <SetupTab setup={setup} setSetup={setSetup} />}

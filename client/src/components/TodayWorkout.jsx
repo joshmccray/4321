@@ -1,7 +1,34 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
+import { useDailyPowerUps, usePowerUps } from '../hooks/usePowerUps';
+import PowerUpCard from './PowerUpCard';
+import ProgressionBar from './ProgressionBar';
 
-export default function TodayWorkout({ todayWorkout, logWorkout, currentWeek }) {
+export default function TodayWorkout({ todayWorkout, logWorkout, currentWeek, user }) {
+  const [loggedExercises, setLoggedExercises] = useState(new Set());
+  const [powerUpsUnlocked, setPowerUpsUnlocked] = useState(false);
+  const dailyPowerUps = useDailyPowerUps(todayWorkout?.day);
+  const { progression, loading, logPowerUp } = usePowerUps(user);
+
+  // Check if all main exercises are logged to unlock power-ups
+  useEffect(() => {
+    if (todayWorkout && loggedExercises.size === todayWorkout.exercises.length) {
+      setPowerUpsUnlocked(true);
+    }
+  }, [loggedExercises, todayWorkout]);
+
+  const handleExerciseLogged = (exerciseName) => {
+    setLoggedExercises(prev => new Set([...prev, exerciseName]));
+  };
+
+  const handlePowerUpComplete = async (powerUpData) => {
+    const success = await logPowerUp(powerUpData);
+    if (success) {
+      // Show success message or animation
+      alert(`🎉 +${powerUpData.totalXP} XP! Power-up complete!`);
+    }
+  };
+
   if (!todayWorkout) {
     return (
       <div className="card">
@@ -14,28 +41,55 @@ export default function TodayWorkout({ todayWorkout, logWorkout, currentWeek }) 
   }
 
   return (
-    <div className="card">
-      <div className="today-header">
-        <div className="today-title">Today's Workout - {todayWorkout.dayName}</div>
-        <div className="today-date">{format(new Date(), 'EEEE, MMM d, yyyy')}</div>
+    <>
+      {!loading && progression && (
+        <ProgressionBar progression={progression} />
+      )}
+
+      <div className="card">
+        <div className="today-header">
+          <div className="today-title">Today's Workout - {todayWorkout.dayName}</div>
+          <div className="today-date">{format(new Date(), 'EEEE, MMM d, yyyy')}</div>
+        </div>
+
+        <div className="today-workout">
+          {todayWorkout.exercises.map((exercise, idx) => (
+            <ExerciseLogItem
+              key={idx}
+              exercise={exercise}
+              logWorkout={logWorkout}
+              currentWeek={currentWeek}
+              day={todayWorkout.day}
+              onLogged={handleExerciseLogged}
+            />
+          ))}
+        </div>
       </div>
 
-      <div className="today-workout">
-        {todayWorkout.exercises.map((exercise, idx) => (
-          <ExerciseLogItem
-            key={idx}
-            exercise={exercise}
-            logWorkout={logWorkout}
-            currentWeek={currentWeek}
-            day={todayWorkout.day}
-          />
-        ))}
-      </div>
-    </div>
+      {powerUpsUnlocked && dailyPowerUps.length > 0 && (
+        <div className="powerups-section">
+          <div className="powerups-unlock-header">
+            <div className="powerups-unlock-title">⚡ Power-Ups Unlocked! ⚡</div>
+            <div className="powerups-unlock-subtitle">
+              Main lifts complete! Boost your gains with optional accessory work
+            </div>
+          </div>
+
+          {dailyPowerUps.map((powerUp, idx) => (
+            <PowerUpCard
+              key={idx}
+              powerUp={powerUp}
+              onComplete={handlePowerUpComplete}
+              userLevel={progression?.total_xp || 0}
+            />
+          ))}
+        </div>
+      )}
+    </>
   );
 }
 
-function ExerciseLogItem({ exercise, logWorkout, currentWeek, day }) {
+function ExerciseLogItem({ exercise, logWorkout, currentWeek, day, onLogged }) {
   const [weight, setWeight] = useState(
     exercise.weight === 'BW' ? 'BW' : exercise.weight === 0 ? '' : String(exercise.weight)
   );
@@ -49,6 +103,9 @@ function ExerciseLogItem({ exercise, logWorkout, currentWeek, day }) {
     logWorkout(today, currentWeek, day, exercise.name, weight, sets, success, notes);
     setLogged(true);
     setNotes('');
+    if (onLogged) {
+      onLogged(exercise.name);
+    }
   };
 
   return (
