@@ -25,12 +25,23 @@ body {
   color: var(--text-primary);
   line-height: 1.6;
   overflow-x: hidden;
+  width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 .app {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .app {
+    padding: 2rem 1rem;
+  }
 }
 
 .header {
@@ -71,9 +82,17 @@ h1 {
 
 .goals-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 1rem;
-  margin-bottom: 3rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+@media (min-width: 640px) {
+  .goals-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 3rem;
+  }
 }
 
 .goal-card {
@@ -161,9 +180,16 @@ h1 {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 2rem;
-  margin-bottom: 2rem;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
   animation: slideIn 0.3s ease-out;
+}
+
+@media (min-width: 640px) {
+  .card {
+    padding: 2rem;
+    margin-bottom: 2rem;
+  }
 }
 
 .card-title {
@@ -379,9 +405,15 @@ input[type="number"] {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 3rem 2rem;
+  padding: 2rem 1rem;
   max-width: 450px;
   width: 100%;
+}
+
+@media (min-width: 640px) {
+  .auth-card {
+    padding: 3rem 2rem;
+  }
 }
 
 .auth-title {
@@ -522,8 +554,12 @@ input[type="number"] {
 }
 
 @media (max-width: 768px) {
-  .app {
-    padding: 1rem 0.5rem;
+  .header {
+    margin-bottom: 1.5rem;
+  }
+
+  .subtitle {
+    font-size: 0.75rem;
   }
 
   .exercise-item {
@@ -538,6 +574,7 @@ input[type="number"] {
 
   .form-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
   }
 
   .quick-log-form {
@@ -546,6 +583,23 @@ input[type="number"] {
 
   .quick-log-form .form-group {
     width: 100%;
+  }
+
+  .tabs {
+    gap: 0.25rem;
+  }
+
+  .tab {
+    padding: 0.6rem 1rem;
+    font-size: 0.75rem;
+  }
+
+  .workout-day {
+    padding: 1rem;
+  }
+
+  .card-title {
+    font-size: 1.2rem;
   }
 }
 
