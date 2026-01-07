@@ -94,26 +94,28 @@ export function useWorkoutData() {
   const saveSetup = async (newSetup) => {
     if (!user) return;
 
-    setSetup(newSetup);
+    // Merge with existing setup to preserve all fields
+    const mergedSetup = { ...setup, ...newSetup };
+    setSetup(mergedSetup);
 
     const { error } = await supabase
       .from('user_setup')
       .upsert({
         user_id: user.id,
-        squat_max: newSetup.squatMax,
-        deadlift_max: newSetup.deadliftMax,
-        bench_max: newSetup.benchMax,
-        press_max: newSetup.pressMax,
-        front_squat_max: newSetup.frontSquatMax,
-        rdl_max: newSetup.rdlMax,
+        squat_max: mergedSetup.squatMax,
+        deadlift_max: mergedSetup.deadliftMax,
+        bench_max: mergedSetup.benchMax,
+        press_max: mergedSetup.pressMax,
+        front_squat_max: mergedSetup.frontSquatMax,
+        rdl_max: mergedSetup.rdlMax,
         current_week: currentWeek,
-        goal_tier: newSetup.goalTier,
-        goal_deadlift: newSetup.goalDeadlift,
-        goal_squat: newSetup.goalSquat,
-        goal_bench: newSetup.goalBench,
-        goal_press: newSetup.goalPress,
-        character_class: newSetup.characterClass,
-        onboarding_completed: newSetup.onboardingCompleted
+        goal_tier: mergedSetup.goalTier,
+        goal_deadlift: mergedSetup.goalDeadlift,
+        goal_squat: mergedSetup.goalSquat,
+        goal_bench: mergedSetup.goalBench,
+        goal_press: mergedSetup.goalPress,
+        character_class: mergedSetup.characterClass,
+        onboarding_completed: mergedSetup.onboardingCompleted
       }, {
         onConflict: 'user_id'
       });
