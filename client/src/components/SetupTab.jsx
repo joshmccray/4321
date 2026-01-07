@@ -1,7 +1,10 @@
 import { calculateWeights } from '../lib/workoutData';
+import { getAllGoalTiers, getAllCharacterClasses } from '../lib/characterClasses';
 
 export default function SetupTab({ setup, setSetup }) {
   const weights = calculateWeights(setup);
+  const goalTiers = getAllGoalTiers();
+  const characterClasses = getAllCharacterClasses();
 
   const handleChange = (field, value) => {
     setSetup({
@@ -10,9 +13,126 @@ export default function SetupTab({ setup, setSetup }) {
     });
   };
 
+  const handleGoalTierChange = (tierId) => {
+    const tier = goalTiers.find(t => t.id === tierId);
+    if (tier) {
+      setSetup({
+        ...setup,
+        goalTier: tierId,
+        goalDeadlift: tier.goals.deadlift,
+        goalSquat: tier.goals.squat,
+        goalBench: tier.goals.bench,
+        goalPress: tier.goals.press
+      });
+    }
+  };
+
+  const handleCharacterClassChange = (classId) => {
+    setSetup({
+      ...setup,
+      characterClass: classId
+    });
+  };
+
+  const handleRerunOnboarding = () => {
+    setSetup({
+      ...setup,
+      onboardingCompleted: false
+    });
+  };
+
+  const currentTier = goalTiers.find(t => t.id === setup.goalTier);
+  const currentClass = characterClasses.find(c => c.id === setup.characterClass);
+
   return (
-    <div className="card">
-      <div className="card-title">Current 1RM Maxes</div>
+    <>
+      {/* Training Preferences */}
+      <div className="card">
+        <div className="card-title">Training Preferences</div>
+
+        <div style={{ marginBottom: '2rem' }}>
+          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>Goal Tier</label>
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+            {goalTiers.map(tier => (
+              <button
+                key={tier.id}
+                onClick={() => handleGoalTierChange(tier.id)}
+                className={`btn ${setup.goalTier === tier.id ? 'btn-primary' : 'btn-secondary'}`}
+                style={{
+                  flex: '1',
+                  minWidth: '150px',
+                  borderColor: setup.goalTier === tier.id ? tier.color : undefined
+                }}
+              >
+                {tier.icon} {tier.name}
+              </button>
+            ))}
+          </div>
+          {currentTier && (
+            <div style={{
+              marginTop: '1rem',
+              padding: '1rem',
+              background: 'var(--bg-secondary)',
+              borderRadius: '6px',
+              borderLeft: `3px solid ${currentTier.color}`
+            }}>
+              <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
+                Current Goals: DL {currentTier.goals.deadlift} | SQ {currentTier.goals.squat} | BP {currentTier.goals.bench} | OHP {currentTier.goals.press}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div style={{ marginBottom: '1rem' }}>
+          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>Character Class</label>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.5rem' }}>
+            {characterClasses.map(charClass => (
+              <button
+                key={charClass.id}
+                onClick={() => handleCharacterClassChange(charClass.id)}
+                className={`btn ${setup.characterClass === charClass.id ? 'btn-primary' : 'btn-secondary'}`}
+                style={{
+                  textAlign: 'left',
+                  borderColor: setup.characterClass === charClass.id ? charClass.color : undefined
+                }}
+              >
+                <div>{charClass.icon} {charClass.name}</div>
+                <div style={{ fontSize: '0.75rem', opacity: 0.8, marginTop: '0.25rem' }}>
+                  {charClass.volumeScheme.main}
+                </div>
+              </button>
+            ))}
+          </div>
+          {currentClass && (
+            <div style={{
+              marginTop: '1rem',
+              padding: '1rem',
+              background: 'var(--bg-secondary)',
+              borderRadius: '6px',
+              borderLeft: `3px solid ${currentClass.color}`
+            }}>
+              <div style={{ fontSize: '0.875rem', color: 'var(--text-primary)', marginBottom: '0.25rem' }}>
+                {currentClass.tagline}
+              </div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                {currentClass.volumeScheme.description}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <button
+          onClick={handleRerunOnboarding}
+          className="btn btn-secondary"
+          style={{ marginTop: '1rem', width: '100%' }}
+        >
+          🔄 Re-run Onboarding Wizard
+        </button>
+      </div>
+
+      {/* 1RM Maxes */}
+      <div className="card">
+        <div className="card-title">Current 1RM Maxes</div>
       <div className="form-grid">
         <div className="form-group">
           <label>Squat 1RM</label>
@@ -86,5 +206,6 @@ export default function SetupTab({ setup, setSetup }) {
         </div>
       </div>
     </div>
+    </>
   );
 }

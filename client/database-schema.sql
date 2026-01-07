@@ -1,7 +1,7 @@
 -- 4/3/2/1 Workout Tracker Database Schema
 -- Execute this SQL in your Supabase SQL Editor
 
--- User setup table (stores 1RM maxes and current week)
+-- User setup table (stores 1RM maxes, current week, goals, and character class)
 CREATE TABLE user_setup (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -12,6 +12,13 @@ CREATE TABLE user_setup (
   front_squat_max INTEGER NOT NULL DEFAULT 225,
   rdl_max INTEGER NOT NULL DEFAULT 185,
   current_week VARCHAR(1) NOT NULL DEFAULT 'A',
+  goal_tier VARCHAR(10) DEFAULT '4321',
+  goal_deadlift INTEGER DEFAULT 405,
+  goal_squat INTEGER DEFAULT 315,
+  goal_bench INTEGER DEFAULT 225,
+  goal_press INTEGER DEFAULT 135,
+  character_class VARCHAR(50) DEFAULT 'tactician',
+  onboarding_completed BOOLEAN DEFAULT false,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   UNIQUE(user_id)

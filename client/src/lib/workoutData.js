@@ -1,73 +1,81 @@
 // Workout calculation utilities
+import { getVolumeScheme } from './characterClasses';
+
 export const calculateStartWeight = (max, percentage) => {
   return Math.round((max * percentage) / 2.5) * 2.5;
 };
 
 export const calculateWeights = (setup) => {
   return {
-    squat: calculateStartWeight(setup.squatMax, 0.85),
-    deadlift: calculateStartWeight(setup.deadliftMax, 0.85),
-    bench: calculateStartWeight(setup.benchMax, 0.85),
-    press: calculateStartWeight(setup.pressMax, 0.85),
-    frontSquat: calculateStartWeight(setup.frontSquatMax, 0.80),
-    rdl: calculateStartWeight(setup.rdlMax, 0.70)
+    squat: calculateStartWeight(setup.squatMax || setup.squat_max, 0.85),
+    deadlift: calculateStartWeight(setup.deadliftMax || setup.deadlift_max, 0.85),
+    bench: calculateStartWeight(setup.benchMax || setup.bench_max, 0.85),
+    press: calculateStartWeight(setup.pressMax || setup.press_max, 0.85),
+    frontSquat: calculateStartWeight(setup.frontSquatMax || setup.front_squat_max, 0.80),
+    rdl: calculateStartWeight(setup.rdlMax || setup.rdl_max, 0.70)
   };
 };
 
-export const getWeekWorkouts = (weights, week) => {
+export const getWeekWorkouts = (weights, week, characterClass = 'tactician') => {
+  // Get volume schemes for this character class
+  const mainScheme = getVolumeScheme(characterClass, 'main');
+  const volumeScheme = getVolumeScheme(characterClass, 'volume');
+  const accessoryScheme = getVolumeScheme(characterClass, 'accessory');
+
+
   const weekAWorkouts = {
     monday: [
-      { name: 'Squat', sets: '3x5', weight: weights.squat },
-      { name: 'Bench Press', sets: '3x5', weight: weights.bench },
-      { name: 'Barbell Rows', sets: '3x5', weight: 0 }
+      { name: 'Squat', sets: mainScheme, weight: weights.squat },
+      { name: 'Bench Press', sets: mainScheme, weight: weights.bench },
+      { name: 'Barbell Rows', sets: accessoryScheme, weight: 0 }
     ],
     tuesday: [
-      { name: 'Overhead Press', sets: '3x5', weight: weights.press },
-      { name: 'Deadlift (Light)', sets: '3x5', weight: Math.round(weights.deadlift * 0.85) },
-      { name: 'Chin-ups', sets: '3x8-10', weight: 'BW' }
+      { name: 'Overhead Press', sets: mainScheme, weight: weights.press },
+      { name: 'Deadlift (Light)', sets: mainScheme, weight: Math.round(weights.deadlift * 0.85) },
+      { name: 'Chin-ups', sets: accessoryScheme, weight: 'BW' }
     ],
     wednesday: [
-      { name: 'Squat', sets: '3x5', weight: weights.squat + 5 },
-      { name: 'Bench Press', sets: '5x5', weight: Math.round(weights.bench * 0.9 / 2.5) * 2.5 },
-      { name: 'Dips', sets: '3x10', weight: 'BW' }
+      { name: 'Squat', sets: mainScheme, weight: weights.squat + 5 },
+      { name: 'Bench Press', sets: volumeScheme, weight: Math.round(weights.bench * 0.9 / 2.5) * 2.5 },
+      { name: 'Dips', sets: accessoryScheme, weight: 'BW' }
     ],
     thursday: [
-      { name: 'Overhead Press', sets: '5x5', weight: Math.round(weights.press * 0.9 / 2.5) * 2.5 },
-      { name: 'Front Squat', sets: '3x5', weight: weights.frontSquat },
-      { name: 'Romanian Deadlift', sets: '3x8', weight: weights.rdl }
+      { name: 'Overhead Press', sets: volumeScheme, weight: Math.round(weights.press * 0.9 / 2.5) * 2.5 },
+      { name: 'Front Squat', sets: mainScheme, weight: weights.frontSquat },
+      { name: 'Romanian Deadlift', sets: accessoryScheme, weight: weights.rdl }
     ],
     friday: [
-      { name: 'Squat', sets: '3x5', weight: weights.squat + 10 },
-      { name: 'Deadlift (Heavy)', sets: '1x5', weight: weights.deadlift },
-      { name: 'Barbell Rows', sets: '3x5', weight: 0 }
+      { name: 'Squat', sets: mainScheme, weight: weights.squat + 10 },
+      { name: 'Deadlift (Heavy)', sets: mainScheme, weight: weights.deadlift },
+      { name: 'Barbell Rows', sets: accessoryScheme, weight: 0 }
     ]
   };
 
   const weekBWorkouts = {
     monday: [
-      { name: 'Squat', sets: '3x5', weight: weights.squat },
-      { name: 'Overhead Press', sets: '3x5', weight: weights.press },
-      { name: 'Barbell Rows', sets: '3x5', weight: 0 }
+      { name: 'Squat', sets: mainScheme, weight: weights.squat },
+      { name: 'Overhead Press', sets: mainScheme, weight: weights.press },
+      { name: 'Barbell Rows', sets: accessoryScheme, weight: 0 }
     ],
     tuesday: [
-      { name: 'Bench Press', sets: '3x5', weight: weights.bench },
-      { name: 'Deadlift (Light)', sets: '3x5', weight: Math.round(weights.deadlift * 0.85) },
-      { name: 'Pull-ups', sets: '3x8-10', weight: 'BW' }
+      { name: 'Bench Press', sets: mainScheme, weight: weights.bench },
+      { name: 'Deadlift (Light)', sets: mainScheme, weight: Math.round(weights.deadlift * 0.85) },
+      { name: 'Pull-ups', sets: accessoryScheme, weight: 'BW' }
     ],
     wednesday: [
-      { name: 'Squat', sets: '3x5', weight: weights.squat + 5 },
-      { name: 'Overhead Press', sets: '5x5', weight: Math.round(weights.press * 0.9 / 2.5) * 2.5 },
-      { name: 'Close-Grip Bench', sets: '3x8', weight: 0 }
+      { name: 'Squat', sets: mainScheme, weight: weights.squat + 5 },
+      { name: 'Overhead Press', sets: volumeScheme, weight: Math.round(weights.press * 0.9 / 2.5) * 2.5 },
+      { name: 'Close-Grip Bench', sets: accessoryScheme, weight: 0 }
     ],
     thursday: [
-      { name: 'Bench Press', sets: '5x5', weight: Math.round(weights.bench * 0.9 / 2.5) * 2.5 },
-      { name: 'Front Squat', sets: '3x5', weight: weights.frontSquat },
-      { name: 'Romanian Deadlift', sets: '3x8', weight: weights.rdl }
+      { name: 'Bench Press', sets: volumeScheme, weight: Math.round(weights.bench * 0.9 / 2.5) * 2.5 },
+      { name: 'Front Squat', sets: mainScheme, weight: weights.frontSquat },
+      { name: 'Romanian Deadlift', sets: accessoryScheme, weight: weights.rdl }
     ],
     friday: [
-      { name: 'Squat', sets: '3x5', weight: weights.squat + 10 },
-      { name: 'Deadlift (Heavy)', sets: '1x5', weight: weights.deadlift },
-      { name: 'Barbell Rows', sets: '3x5', weight: 0 }
+      { name: 'Squat', sets: mainScheme, weight: weights.squat + 10 },
+      { name: 'Deadlift (Heavy)', sets: mainScheme, weight: weights.deadlift },
+      { name: 'Barbell Rows', sets: accessoryScheme, weight: 0 }
     ]
   };
 
@@ -85,7 +93,7 @@ export const getDayName = (dayKey) => {
   return dayNames[dayKey] || dayKey;
 };
 
-export const getTodayWorkout = (weights, currentWeek) => {
+export const getTodayWorkout = (weights, currentWeek, characterClass = 'tactician') => {
   const daysOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
   const today = new Date().getDay();
   const todayKey = daysOfWeek[today];
@@ -95,7 +103,7 @@ export const getTodayWorkout = (weights, currentWeek) => {
     return null;
   }
 
-  const workouts = getWeekWorkouts(weights, currentWeek);
+  const workouts = getWeekWorkouts(weights, currentWeek, characterClass);
   return {
     day: todayKey,
     dayName: getDayName(todayKey),

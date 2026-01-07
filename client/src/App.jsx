@@ -3,18 +3,12 @@ import { useAuth } from './hooks/useAuth';
 import { useWorkoutData } from './hooks/useWorkoutData';
 import { calculateWeights, getWeekWorkouts, getTodayWorkout } from './lib/workoutData';
 import Auth from './components/Auth';
+import OnboardingWizard from './components/OnboardingWizard';
 import TodayWorkout from './components/TodayWorkout';
 import SetupTab from './components/SetupTab';
 import WeekTab from './components/WeekTab';
 import HistoryTab from './components/HistoryTab';
 import './styles/index.css';
-
-const GOALS = [
-  { label: 'Deadlift', weight: 405 },
-  { label: 'Squat', weight: 315 },
-  { label: 'Bench', weight: 225 },
-  { label: 'Press', weight: 135 }
-];
 
 function App() {
   const { user, loading: authLoading, signOut } = useAuth();
@@ -35,10 +29,31 @@ function App() {
     return <Auth />;
   }
 
+  // Show onboarding if not completed
+  if (!setup.onboardingCompleted) {
+    const handleOnboardingComplete = async (onboardingData) => {
+      await setSetup({
+        ...setup,
+        ...onboardingData
+      });
+    };
+
+    return <OnboardingWizard onComplete={handleOnboardingComplete} />;
+  }
+
   const weights = calculateWeights(setup);
-  const weekAWorkouts = getWeekWorkouts(weights, 'A');
-  const weekBWorkouts = getWeekWorkouts(weights, 'B');
-  const todayWorkout = getTodayWorkout(weights, currentWeek);
+  const characterClass = setup.characterClass || 'tactician';
+  const weekAWorkouts = getWeekWorkouts(weights, 'A', characterClass);
+  const weekBWorkouts = getWeekWorkouts(weights, 'B', characterClass);
+  const todayWorkout = getTodayWorkout(weights, currentWeek, characterClass);
+
+  // Use custom goals from setup instead of hardcoded values
+  const goals = [
+    { label: 'Deadlift', weight: setup.goalDeadlift || 405 },
+    { label: 'Squat', weight: setup.goalSquat || 315 },
+    { label: 'Bench', weight: setup.goalBench || 225 },
+    { label: 'Press', weight: setup.goalPress || 135 }
+  ];
 
   return (
     <div className="app">
@@ -55,7 +70,7 @@ function App() {
       </div>
 
       <div className="goals-grid">
-        {GOALS.map(goal => (
+        {goals.map(goal => (
           <div key={goal.label} className="goal-card">
             <div className="goal-label">{goal.label}</div>
             <div className="goal-weight">

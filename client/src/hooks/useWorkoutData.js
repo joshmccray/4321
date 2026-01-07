@@ -8,7 +8,14 @@ const DEFAULT_SETUP = {
   benchMax: 165,
   pressMax: 105,
   frontSquatMax: 225,
-  rdlMax: 185
+  rdlMax: 185,
+  goalTier: '4321',
+  goalDeadlift: 405,
+  goalSquat: 315,
+  goalBench: 225,
+  goalPress: 135,
+  characterClass: 'tactician',
+  onboardingCompleted: false
 };
 
 export function useWorkoutData() {
@@ -45,7 +52,14 @@ export function useWorkoutData() {
         benchMax: setupData.bench_max,
         pressMax: setupData.press_max,
         frontSquatMax: setupData.front_squat_max,
-        rdlMax: setupData.rdl_max
+        rdlMax: setupData.rdl_max,
+        goalTier: setupData.goal_tier || '4321',
+        goalDeadlift: setupData.goal_deadlift || 405,
+        goalSquat: setupData.goal_squat || 315,
+        goalBench: setupData.goal_bench || 225,
+        goalPress: setupData.goal_press || 135,
+        characterClass: setupData.character_class || 'tactician',
+        onboardingCompleted: setupData.onboarding_completed || false
       });
       setCurrentWeek(setupData.current_week);
     } else {
@@ -92,7 +106,14 @@ export function useWorkoutData() {
         press_max: newSetup.pressMax,
         front_squat_max: newSetup.frontSquatMax,
         rdl_max: newSetup.rdlMax,
-        current_week: currentWeek
+        current_week: currentWeek,
+        goal_tier: newSetup.goalTier,
+        goal_deadlift: newSetup.goalDeadlift,
+        goal_squat: newSetup.goalSquat,
+        goal_bench: newSetup.goalBench,
+        goal_press: newSetup.goalPress,
+        character_class: newSetup.characterClass,
+        onboarding_completed: newSetup.onboardingCompleted
       }, {
         onConflict: 'user_id'
       });
