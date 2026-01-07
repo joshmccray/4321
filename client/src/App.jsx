@@ -33,11 +33,11 @@ function App() {
   if (!setup.onboardingCompleted) {
     const handleOnboardingComplete = async (onboardingData) => {
       console.log('Onboarding complete with data:', onboardingData);
-      await setSetup({
-        ...setup,
-        ...onboardingData
-      });
-      // Reload setup from database to ensure we have the latest data
+      // Save the onboarding data (this will merge with existing setup)
+      await setSetup(onboardingData);
+      // Give the database a moment to complete the write
+      await new Promise(resolve => setTimeout(resolve, 500));
+      // Reload setup from database to get the saved onboarding_completed flag
       await reloadSetup();
     };
 

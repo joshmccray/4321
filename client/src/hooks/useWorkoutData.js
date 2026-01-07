@@ -39,14 +39,23 @@ export function useWorkoutData() {
     setLoading(true);
 
     // Load user setup
-    const { data: setupData } = await supabase
+    const { data: setupData, error: fetchError } = await supabase
       .from('user_setup')
       .select('*')
       .eq('user_id', user.id)
       .single();
 
+    if (fetchError) {
+      console.error('Error fetching setup:', fetchError);
+    }
+
     if (setupData) {
-      setSetup({
+      console.log('Loaded setup data from DB:', {
+        onboarding_completed: setupData.onboarding_completed,
+        type: typeof setupData.onboarding_completed
+      });
+
+      const loadedSetup = {
         squatMax: setupData.squat_max,
         deadliftMax: setupData.deadlift_max,
         benchMax: setupData.bench_max,
@@ -60,10 +69,14 @@ export function useWorkoutData() {
         goalPress: setupData.goal_press || 135,
         characterClass: setupData.character_class || 'tactician',
         onboardingCompleted: setupData.onboarding_completed === true
-      });
+      };
+
+      console.log('Setting setup state with onboardingCompleted:', loadedSetup.onboardingCompleted);
+      setSetup(loadedSetup);
       setCurrentWeek(setupData.current_week);
     } else {
       // Create default setup for new user
+      console.log('No setup data found, creating default');
       await saveSetup(DEFAULT_SETUP);
     }
 
