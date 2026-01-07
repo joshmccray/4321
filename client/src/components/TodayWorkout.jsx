@@ -66,6 +66,34 @@ export default function TodayWorkout({ todayWorkout, logWorkout, currentWeek, us
         </div>
       </div>
 
+      {!powerUpsUnlocked && dailyPowerUps.length > 0 && (
+        <div className="powerups-preview">
+          <div className="powerups-preview-header">
+            <div className="powerups-preview-icon">🔒</div>
+            <div className="powerups-preview-content">
+              <div className="powerups-preview-title">Power-Ups Available!</div>
+              <div className="powerups-preview-subtitle">
+                Complete all main lifts to unlock {dailyPowerUps.length} accessory power-ups
+              </div>
+              <div className="powerups-preview-progress">
+                {loggedExercises.size} / {todayWorkout.exercises.length} exercises logged
+              </div>
+            </div>
+          </div>
+
+          <div className="powerups-preview-grid">
+            {dailyPowerUps.map((powerUp, idx) => (
+              <div key={idx} className="powerup-preview-card" style={{ '--theme-color': powerUp.theme.color }}>
+                <div className="powerup-preview-name">{powerUp.theme.name}</div>
+                <div className="powerup-preview-xp">
+                  +{powerUp.theme.exercises.reduce((sum, ex) => sum + ex.xp, 0)} XP
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {powerUpsUnlocked && dailyPowerUps.length > 0 && (
         <div className="powerups-section">
           <div className="powerups-unlock-header">
