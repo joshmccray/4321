@@ -1,16 +1,42 @@
+import { useState } from 'react';
 import { calculateWeights } from '../lib/workoutData';
 import { getAllGoalTiers, getAllCharacterClasses } from '../lib/characterClasses';
 
 export default function SetupTab({ setup, setSetup }) {
-  const weights = calculateWeights(setup);
+  const [localSetup, setLocalSetup] = useState(setup);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
+  const weights = calculateWeights(localSetup);
   const goalTiers = getAllGoalTiers();
   const characterClasses = getAllCharacterClasses();
 
   const handleChange = (field, value) => {
-    setSetup({
-      ...setup,
+    setLocalSetup({
+      ...localSetup,
       [field]: Number(value)
     });
+    setSaveSuccess(false);
+  };
+
+  const handleSave1RMs = async () => {
+    setIsSaving(true);
+    setSaveSuccess(false);
+
+    await setSetup({
+      squatMax: localSetup.squatMax,
+      deadliftMax: localSetup.deadliftMax,
+      benchMax: localSetup.benchMax,
+      pressMax: localSetup.pressMax,
+      frontSquatMax: localSetup.frontSquatMax,
+      rdlMax: localSetup.rdlMax
+    });
+
+    setIsSaving(false);
+    setSaveSuccess(true);
+
+    // Clear success message after 3 seconds
+    setTimeout(() => setSaveSuccess(false), 3000);
   };
 
   const handleGoalTierChange = (tierId) => {
@@ -43,6 +69,15 @@ export default function SetupTab({ setup, setSetup }) {
 
   const currentTier = goalTiers.find(t => t.id === setup.goalTier);
   const currentClass = characterClasses.find(c => c.id === setup.characterClass);
+
+  // Check if there are unsaved changes in 1RMs
+  const hasUnsavedChanges =
+    localSetup.squatMax !== setup.squatMax ||
+    localSetup.deadliftMax !== setup.deadliftMax ||
+    localSetup.benchMax !== setup.benchMax ||
+    localSetup.pressMax !== setup.pressMax ||
+    localSetup.frontSquatMax !== setup.frontSquatMax ||
+    localSetup.rdlMax !== setup.rdlMax;
 
   return (
     <>
@@ -138,7 +173,7 @@ export default function SetupTab({ setup, setSetup }) {
           <label>Squat 1RM</label>
           <input
             type="number"
-            value={setup.squatMax}
+            value={localSetup.squatMax}
             onChange={(e) => handleChange('squatMax', e.target.value)}
           />
         </div>
@@ -146,7 +181,7 @@ export default function SetupTab({ setup, setSetup }) {
           <label>Deadlift 1RM</label>
           <input
             type="number"
-            value={setup.deadliftMax}
+            value={localSetup.deadliftMax}
             onChange={(e) => handleChange('deadliftMax', e.target.value)}
           />
         </div>
@@ -154,7 +189,7 @@ export default function SetupTab({ setup, setSetup }) {
           <label>Bench Press 1RM</label>
           <input
             type="number"
-            value={setup.benchMax}
+            value={localSetup.benchMax}
             onChange={(e) => handleChange('benchMax', e.target.value)}
           />
         </div>
@@ -162,7 +197,7 @@ export default function SetupTab({ setup, setSetup }) {
           <label>Overhead Press 1RM</label>
           <input
             type="number"
-            value={setup.pressMax}
+            value={localSetup.pressMax}
             onChange={(e) => handleChange('pressMax', e.target.value)}
           />
         </div>
@@ -170,7 +205,7 @@ export default function SetupTab({ setup, setSetup }) {
           <label>Front Squat 1RM</label>
           <input
             type="number"
-            value={setup.frontSquatMax}
+            value={localSetup.frontSquatMax}
             onChange={(e) => handleChange('frontSquatMax', e.target.value)}
           />
         </div>
@@ -178,10 +213,26 @@ export default function SetupTab({ setup, setSetup }) {
           <label>Romanian Deadlift 1RM</label>
           <input
             type="number"
-            value={setup.rdlMax}
+            value={localSetup.rdlMax}
             onChange={(e) => handleChange('rdlMax', e.target.value)}
           />
         </div>
+      </div>
+
+      <div style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <button
+          onClick={handleSave1RMs}
+          className="btn btn-primary"
+          disabled={!hasUnsavedChanges || isSaving}
+          style={{ flex: 1 }}
+        >
+          {isSaving ? 'Saving...' : 'Save 1RM Maxes'}
+        </button>
+        {saveSuccess && (
+          <span className="badge badge-success" style={{ fontSize: '0.875rem' }}>
+            ✓ Saved!
+          </span>
+        )}
       </div>
 
       <div style={{ marginTop: '2rem' }}>
