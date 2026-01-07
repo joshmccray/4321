@@ -12,7 +12,7 @@ import './styles/index.css';
 
 function App() {
   const { user, loading: authLoading, signOut } = useAuth();
-  const { setup, setSetup, currentWeek, setCurrentWeek, workoutLog, logWorkout, loading: dataLoading } = useWorkoutData();
+  const { setup, setSetup, currentWeek, setCurrentWeek, workoutLog, logWorkout, loading: dataLoading, reloadSetup } = useWorkoutData();
   const [activeTab, setActiveTab] = useState('today');
 
   // Show loading state
@@ -32,10 +32,13 @@ function App() {
   // Show onboarding if not completed
   if (!setup.onboardingCompleted) {
     const handleOnboardingComplete = async (onboardingData) => {
+      console.log('Onboarding complete with data:', onboardingData);
       await setSetup({
         ...setup,
         ...onboardingData
       });
+      // Reload setup from database to ensure we have the latest data
+      await reloadSetup();
     };
 
     return <OnboardingWizard onComplete={handleOnboardingComplete} />;

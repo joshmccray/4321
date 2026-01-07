@@ -59,7 +59,7 @@ export function useWorkoutData() {
         goalBench: setupData.goal_bench || 225,
         goalPress: setupData.goal_press || 135,
         characterClass: setupData.character_class || 'tactician',
-        onboardingCompleted: setupData.onboarding_completed || false
+        onboardingCompleted: setupData.onboarding_completed === true
       });
       setCurrentWeek(setupData.current_week);
     } else {
@@ -98,29 +98,37 @@ export function useWorkoutData() {
     const mergedSetup = { ...setup, ...newSetup };
     setSetup(mergedSetup);
 
+    const dbRecord = {
+      user_id: user.id,
+      squat_max: mergedSetup.squatMax,
+      deadlift_max: mergedSetup.deadliftMax,
+      bench_max: mergedSetup.benchMax,
+      press_max: mergedSetup.pressMax,
+      front_squat_max: mergedSetup.frontSquatMax,
+      rdl_max: mergedSetup.rdlMax,
+      current_week: currentWeek,
+      goal_tier: mergedSetup.goalTier,
+      goal_deadlift: mergedSetup.goalDeadlift,
+      goal_squat: mergedSetup.goalSquat,
+      goal_bench: mergedSetup.goalBench,
+      goal_press: mergedSetup.goalPress,
+      character_class: mergedSetup.characterClass,
+      onboarding_completed: mergedSetup.onboardingCompleted
+    };
+
+    console.log('Saving setup:', { onboardingCompleted: mergedSetup.onboardingCompleted });
+
     const { error } = await supabase
       .from('user_setup')
-      .upsert({
-        user_id: user.id,
-        squat_max: mergedSetup.squatMax,
-        deadlift_max: mergedSetup.deadliftMax,
-        bench_max: mergedSetup.benchMax,
-        press_max: mergedSetup.pressMax,
-        front_squat_max: mergedSetup.frontSquatMax,
-        rdl_max: mergedSetup.rdlMax,
-        current_week: currentWeek,
-        goal_tier: mergedSetup.goalTier,
-        goal_deadlift: mergedSetup.goalDeadlift,
-        goal_squat: mergedSetup.goalSquat,
-        goal_bench: mergedSetup.goalBench,
-        goal_press: mergedSetup.goalPress,
-        character_class: mergedSetup.characterClass,
-        onboarding_completed: mergedSetup.onboardingCompleted
-      }, {
+      .upsert(dbRecord, {
         onConflict: 'user_id'
       });
 
-    if (error) console.error('Error saving setup:', error);
+    if (error) {
+      console.error('Error saving setup:', error);
+    } else {
+      console.log('Setup saved successfully');
+    }
   };
 
   const updateCurrentWeek = async (week) => {
@@ -182,6 +190,7 @@ export function useWorkoutData() {
     setCurrentWeek: updateCurrentWeek,
     workoutLog,
     logWorkout,
-    loading
+    loading,
+    reloadSetup: loadUserData
   };
 }
