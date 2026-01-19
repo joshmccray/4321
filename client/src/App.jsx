@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useAuth } from './hooks/useAuth';
 import { useWorkoutData } from './hooks/useWorkoutData';
 import { calculateWeights, getWeekWorkouts, getTodayWorkout } from './lib/workoutData';
-import Auth from './components/Auth';
+import AuthModal from './components/AuthModal';
+import LandingPage from './components/LandingPage';
 import OnboardingWizard from './components/OnboardingWizard';
 import TodayWorkout from './components/TodayWorkout';
 import SetupTab from './components/SetupTab';
@@ -14,6 +15,7 @@ function App() {
   const { user, loading: authLoading, signOut } = useAuth();
   const { setup, setSetup, currentWeek, setCurrentWeek, workoutLog, logWorkout, loading: dataLoading, reloadSetup } = useWorkoutData();
   const [activeTab, setActiveTab] = useState('today');
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   // Show loading state
   if (authLoading || (user && dataLoading)) {
@@ -24,9 +26,14 @@ function App() {
     );
   }
 
-  // Show auth screen if not logged in
+  // Show landing page if not logged in
   if (!user) {
-    return <Auth />;
+    return (
+      <>
+        <LandingPage onGetStarted={() => setShowAuthModal(true)} />
+        <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
+      </>
+    );
   }
 
   // Show onboarding if not completed
@@ -62,7 +69,7 @@ function App() {
     <div className="app">
       <div className="header">
         <h1>4/3/2/1</h1>
-        <div className="subtitle">Starting Strength • 5-Day Split</div>
+        <div className="subtitle">Strength Training • 5-Day Split</div>
       </div>
 
       <div className="user-info">
