@@ -649,6 +649,110 @@ input[type="number"] {
   background-clip: text;
 }
 
+/* Desktop nav button - visible on larger screens */
+.nav-btn-desktop {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .nav-btn-desktop {
+    display: inline-flex;
+  }
+}
+
+/* Hamburger Menu Button */
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  z-index: 1001;
+}
+
+@media (min-width: 768px) {
+  .hamburger {
+    display: none;
+  }
+}
+
+.hamburger-line {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--text-primary);
+  border-radius: 2px;
+  transition: transform 0.3s ease, opacity 0.3s ease, background 0.3s ease;
+}
+
+/* Hamburger to X animation */
+.hamburger.open .hamburger-line:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.hamburger.open .hamburger-line:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.hamburger.open .hamburger-line:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Mobile Menu */
+.mobile-menu {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(10, 14, 39, 0.98);
+  backdrop-filter: blur(20px);
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.mobile-menu.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.mobile-menu-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  gap: 1.5rem;
+  transform: translateY(-20px);
+  opacity: 0;
+  transition: transform 0.3s ease 0.1s, opacity 0.3s ease 0.1s;
+}
+
+.mobile-menu.open .mobile-menu-content {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Close animation - content fades out first */
+.mobile-menu:not(.open) .mobile-menu-content {
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+@media (min-width: 768px) {
+  .mobile-menu {
+    display: none;
+  }
+}
+
 /* Hero Section */
 .hero {
   min-height: 100vh;

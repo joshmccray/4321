@@ -1,7 +1,36 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function LandingPage({ onGetStarted }) {
   const [activeSlide, setActiveSlide] = useState(0);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  // Close menu on escape key
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape' && menuOpen) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [menuOpen]);
+
+  // Prevent body scroll when menu is open
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [menuOpen]);
+
+  const handleSignIn = () => {
+    setMenuOpen(false);
+    onGetStarted();
+  };
 
   return (
     <div className="landing">
@@ -9,10 +38,33 @@ export default function LandingPage({ onGetStarted }) {
       <header className="landing-header">
         <nav className="landing-nav">
           <div className="landing-logo">4/3/2/1</div>
-          <button className="btn" onClick={onGetStarted}>
+
+          {/* Desktop Sign In */}
+          <button className="btn nav-btn-desktop" onClick={onGetStarted}>
             Sign In
           </button>
+
+          {/* Mobile Hamburger Button */}
+          <button
+            className={`hamburger ${menuOpen ? 'open' : ''}`}
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={menuOpen}
+          >
+            <span className="hamburger-line"></span>
+            <span className="hamburger-line"></span>
+            <span className="hamburger-line"></span>
+          </button>
         </nav>
+
+        {/* Mobile Menu */}
+        <div className={`mobile-menu ${menuOpen ? 'open' : ''}`}>
+          <div className="mobile-menu-content">
+            <button className="btn btn-large" onClick={handleSignIn}>
+              Sign In
+            </button>
+          </div>
+        </div>
       </header>
 
       <section className="hero">
